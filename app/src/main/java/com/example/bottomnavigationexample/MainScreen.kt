@@ -30,7 +30,7 @@ enum class MainScreenTab(
         icon = Icons.Outlined.Home,
         label = "Home"
     ),
-    Diaries(
+    List(
         icon = Icons.Outlined.List,
         label = "List"
     ),
