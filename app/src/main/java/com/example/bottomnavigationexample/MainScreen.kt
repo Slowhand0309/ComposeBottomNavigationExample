@@ -14,27 +14,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.bottomnavigationexample.ui.theme.ComposeBottomNavigationExampleTheme
 
 enum class MainScreenTab(
+    val id: String,
     val icon: ImageVector,
     val label: String
 ) {
     Home(
+        id = "main/home",
         icon = Icons.Outlined.Home,
         label = "Home"
     ),
     List(
+        id = "main/list",
         icon = Icons.Outlined.List,
         label = "List"
     ),
     Settings(
+        id = "main/about",
         icon = Icons.Outlined.Info,
         label = "About"
     )
@@ -43,7 +48,9 @@ enum class MainScreenTab(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    var selectedItem by remember { mutableIntStateOf(0) }
+    val nestedNavController = rememberNavController()
+    val navBackStackEntry by nestedNavController.currentBackStackEntryAsState()
+    val currentTab = navBackStackEntry?.destination?.route
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -51,14 +58,30 @@ fun MainScreen() {
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
-                        selected = selectedItem == index,
-                        onClick = { selectedItem = index }
+                        selected = currentTab == item.id,
+                        onClick = { nestedNavController.navigate(item.id) }
                     )
                 }
             }
         }
     ) {
-        Box(modifier = Modifier.padding(it))
+        Box(modifier = Modifier.padding(it)) {
+            NavHost(
+                navController = nestedNavController,
+                startDestination = "main/home",
+                modifier = Modifier,
+            ) {
+                composable("main/home") {
+                    Text("main/home")
+                }
+                composable("main/list") {
+                    Text("main/list")
+                }
+                composable("main/about") {
+                    Text("main/about")
+                }
+            }
+        }
     }
 }
 
